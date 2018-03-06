@@ -6,6 +6,10 @@ import cors from 'cors';
 import path from 'path';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import jwt from 'jsonwebtoken';
+import { createServer } from 'http';
+import { execute, subscribe } from 'graphql';
+import { PubSub } from 'graphql-subscriptions';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 
 import { refreshTokens } from './auth';
 import models from './models';
@@ -67,7 +71,22 @@ app.use(
 );
 
 app.use('/graphiql', graphiqlExpress({ endpointURL: graphqlEndpoint }));
+const server = createServer(app);
 
 models.sequelize.sync().then(() => {
-  app.listen(PORT, () => console.log(`server listening on ${PORT}`));
+  server.listen(PORT, () => {
+    console.log(`server listening on ${PORT}`);
+    /* eslint-disable-next-line no-new */
+    new SubscriptionServer(
+      {
+        execute,
+        subscribe,
+        schema,
+      },
+      {
+        server,
+        path: '/subscriptions',
+      },
+    );
+  });
 });
