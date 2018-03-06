@@ -8,7 +8,6 @@ import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import jwt from 'jsonwebtoken';
 import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
-import { PubSub } from 'graphql-subscriptions';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 
 import { refreshTokens } from './auth';
@@ -70,7 +69,13 @@ app.use(
   })),
 );
 
-app.use('/graphiql', graphiqlExpress({ endpointURL: graphqlEndpoint }));
+app.use(
+  '/graphiql',
+  graphiqlExpress({
+    endpointURL: graphqlEndpoint,
+    subscriptionsEndpoint: 'ws://localhost:3000/subscriptions',
+  }),
+);
 const server = createServer(app);
 
 models.sequelize.sync().then(() => {
@@ -82,6 +87,29 @@ models.sequelize.sync().then(() => {
         execute,
         subscribe,
         schema,
+        onConnect: async ({ token, refreshToken }, webSocket) => {
+          if (token && refreshToken) {
+            let user = null;
+            try {
+              const payload = jwt.verify(token, SECRET);
+              user = payload.user;
+            } catch (err) {
+              const newTokens = await refreshTokens(token, refreshToken, models, SECRET, SECRET2);
+              user = newTokens.user;
+            }
+            if (!user) {
+              throw new Error('Invalid tokens');
+            }
+
+            const member = await models.Member.findOne({ where: { teamId: 1, userId: user.id } });
+
+            if (!member) {
+              throw new Error('You are not a member of this team');
+            }
+            return true;
+          }
+          throw new Error('Missing tokens!');
+        },
       },
       {
         server,
