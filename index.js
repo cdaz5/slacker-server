@@ -54,7 +54,6 @@ app.use(addUser);
 
 const graphqlEndpoint = '/graphql';
 
-// bodyParser is needed just for POST.
 app.use(
   graphqlEndpoint,
   bodyParser.json(),
@@ -80,6 +79,7 @@ const server = createServer(app);
 
 models.sequelize.sync().then(() => {
   server.listen(PORT, () => {
+    /* eslint-disable-next-line no-console */
     console.log(`server listening on ${PORT}`);
     /* eslint-disable-next-line no-new */
     new SubscriptionServer(
