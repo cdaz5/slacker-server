@@ -3,9 +3,9 @@ export default `
   type Team {
     id: Int!
     name: String!
-    owner: Int!
     members: [User!]!
     channels: [Channel!]!
+    admin: Boolean!
   }
 
   type CreateTeamResponse {
@@ -17,6 +17,7 @@ export default `
   type Query {
     allTeams: [Team!]!
     inviteTeams: [Team!]!
+    getTeamMembers(teamId: Int!): [User!]!
   }
 
   type VoidResponse {
