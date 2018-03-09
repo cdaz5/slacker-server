@@ -28,3 +28,18 @@ export const requiresTeamAccess = createResolver(async (parent, { channelId }, {
     throw new Error("You have to be a member of the team to subcribe to it's messages");
   }
 });
+
+export const directMessageSubscription = createResolver(async (parent, { teamId, userId }, { user, models }) => {
+  if (!user || !user.id) {
+    throw new Error('Not authenticated');
+  }
+  const members = await models.Member.findAll({
+    where: {
+      teamId,
+      [models.sequelize.Op.or]: [{ userId: user.id }, { userId }],
+    },
+  });
+  if (!members.length === 2) {
+    throw new Error('something went wrong');
+  }
+});
