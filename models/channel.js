@@ -5,6 +5,10 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    dm: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   });
 
   Channel.associate = (models) => {
@@ -16,6 +20,13 @@ export default (sequelize, DataTypes) => {
     });
     Channel.belongsToMany(models.User, {
       through: 'channel_member',
+      foreignKey: {
+        name: 'channelId',
+        field: 'channel_id',
+      },
+    });
+    Channel.belongsToMany(models.User, {
+      through: models.PCMember,
       foreignKey: {
         name: 'channelId',
         field: 'channel_id',
