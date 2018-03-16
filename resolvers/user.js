@@ -13,6 +13,9 @@ export default {
           raw: true,
         },
       ),
+    // channels: (parent, args, { models, user }) => models.sequelize.query(
+    //   select * from pcmembers as pc, members as m where m.team_id=1 and pc.channel_id = 9;
+    // )
   },
   Query: {
     getUser: (parent, { userId }, { models }) => models.User.findOne({ where: { id: userId } }),
