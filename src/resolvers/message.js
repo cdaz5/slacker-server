@@ -15,6 +15,7 @@ export default {
     },
   },
   Message: {
+    // url: (parent, args, { serverUrl }) => (parent.url ? `${serverUrl}/${parent.url}` : parent.url),
     user: ({ user, userId }, args, { models }) => {
       if (user) {
         return user;
