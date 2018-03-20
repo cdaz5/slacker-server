@@ -9,9 +9,11 @@ import jwt from 'jsonwebtoken';
 import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
+import DataLoader from 'dataloader';
 
 import { refreshTokens } from './auth';
 import models from './models';
+import { channelBatcher } from './batchFunctions';
 
 const SECRET = 'dragons';
 const SECRET2 = 'excalibur';
@@ -64,6 +66,8 @@ app.use(
       user: req.user,
       SECRET,
       SECRET2,
+      channelLoader: new DataLoader(ids => channelBatcher(ids, models, req.user)),
+      serverUrl: `${req.protocol}://${req.get('host')}`,
     },
   })),
 );
