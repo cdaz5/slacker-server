@@ -4,8 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-exports.default = function (sequelize, DataTypes) {
-  var PCMember = sequelize.define('pcmember', {});
+exports.default = (sequelize, DataTypes) => {
+  const PCMember = sequelize.define('pcmember', {});
 
   return PCMember;
 };
