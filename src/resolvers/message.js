@@ -15,12 +15,12 @@ export default {
     },
   },
   Message: {
-    // url: (parent, args, { serverUrl }) => (parent.url ? `${serverUrl}/${parent.url}` : parent.url),
-    user: ({ user, userId }, args, { models }) => {
+    // url: (parent) => (parent.url ? `${process.env.SERVER_URL || 'http://localhost:3000'}/${parent.url}` : parent.url),
+    user: ({ user, userId }, args, { userLoader }) => {
       if (user) {
         return user;
       }
-      return models.User.findOne({ where: { id: userId } }, { raw: true });
+      return userLoader.load(userId);
     },
   },
   Query: {
